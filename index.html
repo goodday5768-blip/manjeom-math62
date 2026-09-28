@@ -365,8 +365,8 @@ function paintSel() {
   document.querySelectorAll('#board .grid button').forEach(b => b.classList.toggle('on', sel.has(+b.dataset.pi)));
   const n = sel.size, q = n ? roundSize(sel) : 0, ok = n >= SEL_MIN;
   if (PC) {
-    const lo = Math.floor(q / n), hi = Math.ceil(q / n);
-    $('#selText').textContent = !n ? `${UW}을 1개 이상 골라 주세요.` : `${selLabel(sel)} — ${n}${UW} · ${q}문제 · 100점 만점` + (q > n ? ` (${UW}마다 ${lo === hi ? lo : lo + '~' + hi}문제)` : q < n ? ` (고른 ${UW} 중 ${q}개에서 1문제씩)` : '');
+    const lo = Math.floor(q / n), hi = Math.ceil(q / n), want = countFor(n);
+    $('#selText').textContent = !n ? `${UW}을 1개 이상 골라 주세요.` : `${selLabel(sel)} — ${n}${UW} · ${q}문제 · 100점 만점` + (q > n ? ` (${UW}마다 ${lo === hi ? lo : lo + '~' + hi}문제)` : q < n ? ` (고른 ${UW} 중 ${q}개에서 1문제씩)` : '') + (n && q < want ? ` — 고른 ${UW}의 문제는 ${q}개까지입니다` : '');
     $('#nPick').value = String(nPick); $('#nPick').options[0].textContent = n ? `자동 (${Math.max(MIN, Math.min(D.cap, n))}문제)` : '자동 (고른 수만큼)';
   } else $('#selText').textContent = !n ? `${UW}을 ${MIN}개 이상 골라 주세요.` : !ok ? `${n}${UW} 선택 — 최소 ${MIN}${UW}을 골라야 시작할 수 있습니다 (${MIN - n}개 더)` : `${selLabel(sel)} — ${n}${UW} · ${q}문제 · 100점 만점`;
   $('#go').disabled = !ok; $('#go').textContent = ok ? `시험 시작 (${q}문제)` : PC ? '시험 시작' : `시험 시작 (최소 ${MIN}${UW})`;
