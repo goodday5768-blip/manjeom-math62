@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>생각 코치 · 원의 둘레와 넓이</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#1f2a37;--mut:#6b7785;--line:#e1e7ee;--acc:#5b8def;--soft:#eaf1fd;--ok:#e6f4e8;--cbub:#eef4ff;--sbub:#fff4e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:calc(19px*var(--fz,1));line-height:1.55}
+header{display:flex;align-items:center;gap:12px;padding:10px 18px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header h1{font-size:calc(20px*var(--fz,1));margin:0;flex:1}
+a.back,button.back{color:var(--acc);text-decoration:none;font-size:calc(17px*var(--fz,1));background:none;border:0;padding:6px 0;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.intro{background:var(--soft);border-radius:14px;padding:14px 18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer}
+.card .t{font-weight:700;font-size:calc(20px*var(--fz,1))}.card .g{font-size:calc(14px*var(--fz,1));color:#3c7a3c;background:#e6f4e8;border-radius:8px;padding:1px 8px;display:inline-block;margin:4px 0}
+.card .s{font-size:calc(15px*var(--fz,1));color:var(--mut)}
+.card svg{width:100%;height:120px}
+#prob{display:none}
+.pg{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+@media (max-width:820px){.pg{grid-template-columns:1fr}}
+.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.ptext{font-size:calc(18px*var(--fz,1))}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:calc(17px*var(--fz,1));cursor:pointer;text-align:left}
+.tab.on{border-color:var(--acc);background:var(--soft)}
+.tab.done{background:var(--ok);border-color:#b7dcbc}
+.tab.done::after{content:" ✓";color:#3c7a3c;font-weight:700}
+#fig{margin-top:8px;background:#fff;border-radius:12px}
+#fig svg{width:100%;height:auto;display:block;max-height:62vh}
+.figbar{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.coach{position:sticky;top:64px;display:flex;flex-direction:column;height:calc(100vh - 96px);min-height:520px}
+#log{flex:1;overflow:auto;padding:4px 2px}
+.b{max-width:92%;margin:8px 0;padding:10px 14px;border-radius:14px;font-size:calc(19px*var(--fz,1))}
+.b.c{background:var(--cbub);border-top-left-radius:4px}
+.b.s{background:var(--sbub);margin-left:auto;border-top-right-radius:4px}
+.b.c::before{content:"코치";display:block;font-size:calc(13px*var(--fz,1));color:var(--acc);font-weight:700}
+.b.s::before{content:"나";display:block;font-size:calc(13px*var(--fz,1));color:#c46a1a;font-weight:700}
+.b.think{color:var(--mut);font-style:italic}
+#live{min-height:30px;color:#c46a1a;font-size:calc(18px*var(--fz,1));padding:4px 6px}
+.ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+#mic{width:92px;height:92px;border-radius:50%;border:0;background:#ff8a65;color:#fff;font-size:calc(40px*var(--fz,1));cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.15);flex:none}
+#mic.on{background:#e53935;animation:pulse 1.2s infinite}
+#mic:disabled{background:#c9ced6}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(229,57,53,.5)}70%{box-shadow:0 0 0 18px rgba(229,57,53,0)}100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}}
+.sbtn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-size:calc(17px*var(--fz,1));cursor:pointer}
+.sbtn.on{background:var(--soft);border-color:var(--acc)}
+.hint{font-size:calc(14px*var(--fz,1));color:var(--mut)}
+#lv{display:inline-flex;gap:3px;vertical-align:middle}#lv i{width:10px;height:10px;border-radius:50%;background:#e1e7ee;display:inline-block}#lv i.f{background:#f6b26b}
+.modal{position:fixed;inset:0;background:rgba(20,30,40,.45);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal .in{background:#fff;border-radius:16px;max-width:560px;width:100%;padding:20px 22px;max-height:92vh;overflow:auto}
+.modal h2{margin:0 0 8px;font-size:calc(21px*var(--fz,1))}
+.modal ul{padding-left:20px;margin:8px 0;font-size:calc(16px*var(--fz,1))}
+.modal input[type=text]{font-size:24px;letter-spacing:4px;padding:10px 12px;width:100%;border:1px solid var(--line);border-radius:10px;text-transform:uppercase}
+.modal label{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:calc(16px*var(--fz,1));background:#fff8e6;border:1px solid #f1e2b8;border-radius:10px;padding:10px}
+.modal label input{width:22px;height:22px;flex:none}
+.pbtn{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 20px;font-size:calc(18px*var(--fz,1));cursor:pointer}
+.pbtn:disabled{background:#b8c4d6}
+#msg{color:#c0392b;font-size:calc(15px*var(--fz,1));min-height:20px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#33414f;color:#fff;padding:10px 16px;border-radius:12px;font-size:calc(16px*var(--fz,1));display:none;z-index:30;max-width:90%}
+/* 그림 */
+.sh{fill:#cfe0ee}.ln{fill:none;stroke:#34495e;stroke-width:1.3}.ln0{fill:none;stroke:#7b8a99;stroke-width:.8}
+.wh{fill:#fff;stroke:#34495e;stroke-width:1.3}.lg{fill:#d5dde6;stroke:#34495e;stroke-width:1.2}.rope{fill:none;stroke:#c0504d;stroke-width:1.8}
+.dot{fill:#34495e}.dash{stroke-dasharray:4 3}
+.lab{font-size:calc(8px*var(--fz,1));fill:#34495e;text-anchor:middle}.cap{font-size:calc(7.5px*var(--fz,1));fill:#6b7785;text-anchor:middle}
+.num{font-size:calc(11px*var(--fz,1));font-weight:700;fill:#c0504d;text-anchor:middle}
+.lab.r{fill:#c0504d}.lab.b{fill:#2f6fb0}.lab.o{fill:#c46a1a}.lab.g{fill:#3c7a3c}
+.tgt{fill:none;stroke:#9aa7b4;stroke-width:1;stroke-dasharray:3 3}
+.hl-o{fill:#f6b26b;fill-opacity:.6;stroke:#e69138;stroke-width:1}.hl-o3{fill:#f6b26b;fill-opacity:.35;stroke:#e69138;stroke-width:.8}
+.hl-od{fill:#f6b26b;fill-opacity:.15;stroke:#e69138;stroke-width:1.4;stroke-dasharray:3 2}
+.hl-or{fill:none;stroke:#e69138;stroke-width:3.2}.hl-ob{fill:none;stroke:#5b9bd5;stroke-width:3.2}.hl-og{fill:none;stroke:#6aa84f;stroke-width:3.2}
+.hl-b{fill:none;stroke:#3d85c6;stroke-width:3.2}.hl-bf{fill:#9fc5e8;fill-opacity:.6;stroke:#3d85c6;stroke-width:1}
+.hl-r{fill:none;stroke:#cc4125;stroke-width:2.4}.hl-rr{fill:none;stroke:#cc4125;stroke-width:3}
+.hl-g{fill:#b6d7a8;fill-opacity:.65;stroke:#6aa84f;stroke-width:1}.hl-gq{fill:none;stroke:#6aa84f;stroke-width:2.6}
+.hl-p{fill:#b4a7d6;fill-opacity:.65;stroke:#8e7cc3;stroke-width:1}.hl-k{fill:#f4cccc;fill-opacity:.8;stroke:#e06666;stroke-width:1}
+.L{opacity:0;transition:opacity .6s}.L.on{opacity:1}
+.go{transition:transform 1.4s ease-in-out;transform-box:view-box}
+.card .L{display:none}
+</style><!--LEESS-GATE2--><script src="/leess/roster.js"></script><script src="/leess/gate.js"></script><!-- 수강생 명단 라이브러리(배포 검사용) — 이 화면은 서버가 학생 코드로 막는다 -->
+<style id="ipadCss">
+/* 아이패드 기준 화면(2026-11-09) — 폭 740px 이상(아이패드 세로·가로, 컴퓨터)에서 본문 폭을 넓히고 글자를 키운다. 휴대폰은 그대로. */
+@media (min-width:740px) and (min-height:560px){
+:root{--fz:1.0}
+
+.wrap{padding-left:26px!important;padding-right:26px!important}
+.brand img{max-width:640px!important}
+input[type=radio],input[type=checkbox]{width:19px;height:19px}
+.lock,.gate{max-width:600px!important}
+#pwaSheet .pwa-box{max-width:620px!important}
+}
+</style>
+</head><body>
+<header><a class="back" href="./">‹ 수학 앱</a><h1>생각 코치 <span style="font-weight:400;font-size:calc(16px*var(--fz,1));color:var(--mut)">원의 둘레와 넓이 응용</span></h1>
+<button class="sbtn" id="snd" title="코치 목소리">🔈 소리 켬</button></header>
+
+<div class="wrap" id="home">
+  <div class="intro">문제를 고르고 <b>🎤 단추</b>를 눌러 말로 이야기하세요. 코치는 답을 알려 주지 않아요. 대신 <b>「이 그림을 어떻게 자르고, 어떻게 붙이고, 어떻게 계산할까」</b>를 함께 생각하며, 막히면 그림으로 살짝 힌트를 보여 줍니다. 계산이 끝나면 답을 말해 보세요.</div>
+  <div class="grid" id="cards"></div>
+  <p class="hint" style="margin-top:18px">말한 내용은 글로 바뀌어 코치(AI)에게 갑니다. 이름은 보내지 않고, 대화는 저장하지 않습니다. <button class="back" id="codeBtn">학생 코드 바꾸기</button></p>
+</div>
+
+<div class="wrap" id="prob">
+  <div class="pg">
+    <div>
+      <div class="box">
+        <button class="back" id="toHome">‹ 문제 목록</button>
+        <div style="font-weight:700;font-size:calc(21px*var(--fz,1));margin:4px 0" id="ptitle"></div>
+        <div class="ptext" id="ptext"></div>
+        <div class="tabs" id="tabs"></div>
+        <div id="fig"></div>
+        <div class="figbar"><span class="hint" style="margin-right:auto">힌트 단계 <span id="lv"></span></span><button class="sbtn" id="clr">그림 힌트 지우기</button></div>
+      </div>
+    </div>
+    <div class="box coach">
+      <div id="log"></div>
+      <div id="live"></div>
+      <div class="ctrl">
+        <button id="mic" title="말하기">🎤</button>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:1">
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="sbtn" id="hintB">💡 힌트 주세요</button><button class="sbtn" id="again">🔁 다시 듣기</button></div>
+          <label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="auto"> 코치 말이 끝나면 바로 듣기</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="codeM"><div class="in">
+  <h2>처음 한 번만 — 학생 코드와 동의</h2>
+  <div style="font-size:calc(16px*var(--fz,1))">선생님께 받은 <b>학생 코드 8자리</b>를 넣어 주세요.</div>
+  <input type="text" id="codeIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false">
+  <ul>
+    <li><b>보내는 것:</b> 내가 말한 내용(글로 바뀐 것), 문제 번호, 이 문제에서 나눈 대화. 이름은 보내지 않습니다.</li>
+    <li><b>받는 곳:</b> 미국 회사 Anthropic(AI Claude)이 코치의 말을 만듭니다. 중간 서버는 미국 회사 Cloudflare입니다. 학원은 대화를 저장하지 않으며, Anthropic은 법에 따라 최대 30일 보관 뒤 지웁니다.</li>
+    <li><b>소리:</b> 아이패드·브라우저의 음성 인식(Apple 또는 Google)이 글로 바꿉니다. 그것이 안 되는 화면에서는 녹음한 소리를 Cloudflare 서버가 글로 바꾸고 바로 버립니다.</li>
+    <li>만 14세 미만은 <b>보호자 동의서(AI 기능·국외 이전 칸)</b>를 낸 학생만 쓸 수 있습니다. 동의하지 않아도 수학 앱의 다른 기능은 그대로 쓸 수 있습니다.</li>
+  </ul>
+  <label><input type="checkbox" id="agree"><span><b>[필수]</b> 위 내용처럼 내가 말한 내용이 미국 회사 Anthropic·Cloudflare의 서버로 보내지는 데 동의합니다.</span></label>
+  <div id="msg"></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end"><button class="sbtn" id="codeX">닫기</button><button class="pbtn" id="codeOk" disabled>시작하기</button></div>
+</div></div>
+<div id="toast"></div>
+
+<script>
+const API='https://yourtable-relay.yourtable-relay.workers.dev';
+const PROBS=[{"id": "p1", "title": "겹친 원 줄", "tag": "거꾸로 추론", "text": "반지름이 5 cm인 원을 각 원의 중심이 이웃한 원의 둘레 위에 오도록 한 줄로 겹쳐 그리고, 바깥 테두리 안쪽을 모두 색칠했습니다. 그림은 원을 4개 그린 경우입니다. 같은 방법으로 원을 여러 개 그렸더니 색칠한 부분의 둘레가 91.4 cm가 되었습니다.", "parts": [{"q": "원을 몇 개 그렸습니까?", "unit": "개"}, {"q": "이때 색칠한 부분의 넓이는 몇 cm²입니까?", "unit": "cm²"}], "svg": "<svg viewBox=\"0 0 220 200\">\n<path class=\"sh\" d=\"M60,30 L150,30 A30,30 0 0 1 150,90 L60,90 A30,30 0 0 1 60,30 Z\"/>\n<circle class=\"ln0\" cx=\"60\" cy=\"60\" r=\"30\"/><circle class=\"ln0\" cx=\"90\" cy=\"60\" r=\"30\"/><circle class=\"ln0\" cx=\"120\" cy=\"60\" r=\"30\"/><circle class=\"ln0\" cx=\"150\" cy=\"60\" r=\"30\"/>\n<line class=\"ln0\" x1=\"60\" y1=\"30\" x2=\"60\" y2=\"90\"/><line class=\"ln0\" x1=\"150\" y1=\"30\" x2=\"150\" y2=\"90\"/>\n<path class=\"ln\" d=\"M60,30 L150,30 A30,30 0 0 1 150,90 L60,90 A30,30 0 0 1 60,30 Z\"/>\n<circle class=\"dot\" cx=\"60\" cy=\"60\" r=\"1.8\"/><circle class=\"dot\" cx=\"90\" cy=\"60\" r=\"1.8\"/><circle class=\"dot\" cx=\"120\" cy=\"60\" r=\"1.8\"/><circle class=\"dot\" cx=\"150\" cy=\"60\" r=\"1.8\"/>\n<line class=\"ln0\" x1=\"30\" y1=\"60\" x2=\"60\" y2=\"60\"/><text class=\"lab\" x=\"45\" y=\"56\">5 cm</text>\n<text class=\"cap\" x=\"105\" y=\"108\">원 4개를 그린 경우</text>\n<g class=\"L\" data-l=\"ends\"><path class=\"hl-o\" d=\"M60,30 A30,30 0 0 0 60,90 Z\"/><path class=\"hl-o\" d=\"M150,30 A30,30 0 0 1 150,90 Z\"/></g>\n<g class=\"L\" data-l=\"ends_join\"><circle class=\"tgt\" cx=\"105\" cy=\"160\" r=\"30\"/>\n<path class=\"hl-o go\" data-to=\"translate(45px,100px)\" d=\"M60,30 A30,30 0 0 0 60,90 Z\"/>\n<path class=\"hl-o go\" data-to=\"translate(-45px,100px)\" d=\"M150,30 A30,30 0 0 1 150,90 Z\"/>\n<text class=\"lab\" x=\"175\" y=\"164\">원 1개!</text></g>\n<g class=\"L\" data-l=\"lines\"><line class=\"hl-b\" x1=\"60\" y1=\"30\" x2=\"150\" y2=\"30\"/><line class=\"hl-b\" x1=\"60\" y1=\"90\" x2=\"150\" y2=\"90\"/><text class=\"lab b\" x=\"105\" y=\"24\">곧은 선</text></g>\n<g class=\"L\" data-l=\"gaps\"><line class=\"hl-r\" x1=\"60\" y1=\"72\" x2=\"150\" y2=\"72\"/>\n<line class=\"hl-r\" x1=\"60\" y1=\"68\" x2=\"60\" y2=\"76\"/><line class=\"hl-r\" x1=\"90\" y1=\"68\" x2=\"90\" y2=\"76\"/><line class=\"hl-r\" x1=\"120\" y1=\"68\" x2=\"120\" y2=\"76\"/><line class=\"hl-r\" x1=\"150\" y1=\"68\" x2=\"150\" y2=\"76\"/>\n<text class=\"lab r\" x=\"75\" y=\"84\">5</text><text class=\"lab r\" x=\"105\" y=\"84\">5</text><text class=\"lab r\" x=\"135\" y=\"84\">5</text></g>\n<g class=\"L\" data-l=\"rect\"><rect class=\"hl-g\" x=\"60\" y=\"30\" width=\"90\" height=\"60\"/><text class=\"lab\" x=\"105\" y=\"50\">가운데 직사각형</text></g>\n<g class=\"L\" data-l=\"count\"><text class=\"num\" x=\"60\" y=\"22\">1</text><text class=\"num\" x=\"90\" y=\"22\">2</text><text class=\"num\" x=\"120\" y=\"22\">3</text><text class=\"num\" x=\"150\" y=\"22\">4</text>\n<text class=\"lab r\" x=\"105\" y=\"122\">원 4개 → 중심 사이 간격 3개</text></g>\n</svg>"}, {"id": "p2", "title": "맞닿은 원 세 개", "tag": "빼서 구하기", "text": "반지름이 4 cm인 원 3개가 한 줄로 서로 맞닿아 있습니다. 양 끝 원의 중심을 지나도록 직사각형을 그렸을 때, 직사각형 안에서 원의 바깥 부분을 색칠했습니다.", "parts": [{"q": "색칠한 부분의 넓이는 몇 cm²입니까?", "unit": "cm²"}, {"q": "색칠한 부분의 둘레(색칠한 조각 4개의 둘레의 합)는 몇 cm입니까?", "unit": "cm"}], "svg": "<svg viewBox=\"0 0 230 200\">\n<rect class=\"sh\" x=\"40\" y=\"22\" width=\"112\" height=\"56\"/>\n<circle class=\"wh\" cx=\"40\" cy=\"50\" r=\"28\"/><circle class=\"wh\" cx=\"96\" cy=\"50\" r=\"28\"/><circle class=\"wh\" cx=\"152\" cy=\"50\" r=\"28\"/>\n<rect class=\"ln\" x=\"40\" y=\"22\" width=\"112\" height=\"56\"/>\n<circle class=\"dot\" cx=\"40\" cy=\"50\" r=\"1.8\"/><circle class=\"dot\" cx=\"96\" cy=\"50\" r=\"1.8\"/><circle class=\"dot\" cx=\"152\" cy=\"50\" r=\"1.8\"/>\n<line class=\"ln0\" x1=\"96\" y1=\"50\" x2=\"124\" y2=\"50\"/><text class=\"lab\" x=\"110\" y=\"46\">4 cm</text>\n<g class=\"L\" data-l=\"rect\"><rect class=\"hl-rr\" x=\"40\" y=\"22\" width=\"112\" height=\"56\"/><text class=\"lab r\" x=\"96\" y=\"92\">가로 = 지름 몇 개?</text><text class=\"lab r\" x=\"184\" y=\"53\" style=\"text-anchor:start\">세로 = 지름</text></g>\n<g class=\"L\" data-l=\"incirc\"><path class=\"hl-o\" d=\"M40,22 A28,28 0 0 1 40,78 Z\"/><circle class=\"hl-o\" cx=\"96\" cy=\"50\" r=\"28\"/><path class=\"hl-o\" d=\"M152,22 A28,28 0 0 0 152,78 Z\"/></g>\n<g class=\"L\" data-l=\"halves_join\"><circle class=\"tgt\" cx=\"68\" cy=\"152\" r=\"28\"/><circle class=\"tgt\" cx=\"140\" cy=\"152\" r=\"28\"/>\n<path class=\"hl-o go\" data-to=\"translate(28px,102px)\" d=\"M40,22 A28,28 0 0 1 40,78 Z\"/>\n<path class=\"hl-o go\" data-to=\"translate(-84px,102px)\" d=\"M152,22 A28,28 0 0 0 152,78 Z\"/>\n<circle class=\"hl-o go\" data-to=\"translate(44px,102px)\" cx=\"96\" cy=\"50\" r=\"28\"/>\n<text class=\"lab\" x=\"200\" y=\"156\">원 2개</text></g>\n<g class=\"L\" data-l=\"piece\"><path class=\"hl-p\" d=\"M40,22 L96,22 A28,28 0 0 0 68,50 A28,28 0 0 0 40,22 Z\"/><text class=\"lab\" x=\"68\" y=\"14\">조각 1개</text></g>\n<g class=\"L\" data-l=\"piece_edges\"><line class=\"hl-b\" x1=\"40\" y1=\"22\" x2=\"96\" y2=\"22\"/>\n<path class=\"hl-r\" d=\"M96,22 A28,28 0 0 0 68,50\"/><path class=\"hl-r\" d=\"M68,50 A28,28 0 0 0 40,22\"/>\n<text class=\"lab b\" x=\"68\" y=\"14\">곧은 선</text><text class=\"lab r\" x=\"58\" y=\"64\">원의 1/4 곡선 2개</text></g>\n</svg>"}, {"id": "p3", "title": "통나무 묶는 끈", "tag": "실생활 응용", "text": "밑면의 반지름이 5 cm인 원기둥 모양 통나무 3개를 끈으로 팽팽하게 한 바퀴 묶으려고 합니다. 그림은 통나무를 위에서 내려다본 모습입니다. (매듭에 쓰이는 끈의 길이는 생각하지 않습니다.) (가)는 한 줄로 놓기, (나)는 삼각형으로 쌓기입니다.", "parts": [{"q": "(가)에 필요한 끈의 길이는 몇 cm입니까?", "unit": "cm"}, {"q": "(나)에 필요한 끈의 길이는 몇 cm입니까?", "unit": "cm"}, {"q": "끈이 덜 드는 방법은 어느 것이고, 몇 cm 덜 듭니까?", "unit": "cm"}], "svg": "<svg viewBox=\"0 0 330 225\">\n<circle class=\"lg\" cx=\"35\" cy=\"45\" r=\"25\"/><circle class=\"lg\" cx=\"85\" cy=\"45\" r=\"25\"/><circle class=\"lg\" cx=\"135\" cy=\"45\" r=\"25\"/>\n<path class=\"rope\" d=\"M35,20 L135,20 A25,25 0 0 1 135,70 L35,70 A25,25 0 0 1 35,20 Z\"/>\n<text class=\"cap\" x=\"85\" y=\"90\">(가) 한 줄로 놓기</text>\n<circle class=\"lg\" cx=\"255\" cy=\"51.7\" r=\"25\"/><circle class=\"lg\" cx=\"230\" cy=\"95.0\" r=\"25\"/><circle class=\"lg\" cx=\"280\" cy=\"95.0\" r=\"25\"/>\n<path class=\"rope\" d=\"M276.7,39.2 L301.7,82.5 A25,25 0 0 1 280.0,120.0 L230.0,120.0 A25,25 0 0 1 208.3,82.5 L233.3,39.2 A25,25 0 0 1 276.7,39.2 Z\"/>\n<text class=\"cap\" x=\"255\" y=\"137\">(나) 삼각형으로 쌓기</text>\n<text class=\"lab\" x=\"35\" y=\"49\">5 cm</text>\n<g class=\"L\" data-l=\"a_lines\"><line class=\"hl-b\" x1=\"35\" y1=\"20\" x2=\"135\" y2=\"20\"/><line class=\"hl-b\" x1=\"35\" y1=\"70\" x2=\"135\" y2=\"70\"/></g>\n<g class=\"L\" data-l=\"a_arcs\"><path class=\"hl-or\" d=\"M35,20 A25,25 0 0 0 35,70\"/><path class=\"hl-or\" d=\"M135,20 A25,25 0 0 1 135,70\"/></g>\n<g class=\"L\" data-l=\"a_cent\"><line class=\"hl-r dash\" x1=\"35\" y1=\"45\" x2=\"135\" y2=\"45\"/><circle class=\"dot\" cx=\"35\" cy=\"45\" r=\"2\"/><circle class=\"dot\" cx=\"85\" cy=\"45\" r=\"2\"/><circle class=\"dot\" cx=\"135\" cy=\"45\" r=\"2\"/><text class=\"lab r\" x=\"85\" y=\"40\">중심 ~ 중심</text></g>\n<g class=\"L\" data-l=\"b_tri\"><path class=\"hl-r dash\" d=\"M255,51.7 L230,95.0 L280,95.0 Z\"/><text class=\"lab r\" x=\"255\" y=\"108\">변 = 지름</text></g>\n<g class=\"L\" data-l=\"b_lines\"><line class=\"hl-b\" x1=\"276.7\" y1=\"39.2\" x2=\"301.7\" y2=\"82.5\"/><line class=\"hl-b\" x1=\"280.0\" y1=\"120.0\" x2=\"230.0\" y2=\"120.0\"/><line class=\"hl-b\" x1=\"208.3\" y1=\"82.5\" x2=\"233.3\" y2=\"39.2\"/></g>\n<g class=\"L\" data-l=\"b_arcs\"><path class=\"hl-or\" d=\"M301.7,82.5 A25,25 0 0 1 280.0,120.0\"/><path class=\"hl-or\" d=\"M230.0,120.0 A25,25 0 0 1 208.3,82.5\"/><path class=\"hl-or\" d=\"M233.3,39.2 A25,25 0 0 1 276.7,39.2\"/></g>\n<g class=\"L\" data-l=\"arcs_join\"><circle class=\"tgt\" cx=\"165\" cy=\"185\" r=\"25\"/>\n<path class=\"hl-or\" d=\"M165,160 A25,25 0 0 1 186.7,197.5\"/><path class=\"hl-ob\" d=\"M186.7,197.5 A25,25 0 0 1 143.3,197.5\"/><path class=\"hl-og\" d=\"M143.3,197.5 A25,25 0 0 1 165,160\"/>\n<text class=\"lab\" x=\"250\" y=\"189\">곡선을 모두 모으면?</text></g>\n</svg>"}, {"id": "p4", "title": "운동장 트랙", "tag": "두 도형의 차", "text": "운동장 트랙을 줄여 그린 그림입니다. 양쪽 곡선 부분은 반원이고, 색칠한 부분이 트랙입니다. 안쪽 반원의 반지름은 6 cm, 트랙의 폭은 4 cm, 직선 구간은 20 cm입니다.", "parts": [{"q": "트랙(색칠한 부분)의 넓이는 몇 cm²입니까?", "unit": "cm²"}, {"q": "바깥쪽 선의 길이는 안쪽 선의 길이보다 몇 cm 더 깁니까?", "unit": "cm"}, {"q": "직선 구간은 그대로 두고 트랙의 폭만 1 cm 넓히면, 바깥쪽 선의 길이는 몇 cm 늘어납니까?", "unit": "cm"}], "svg": "<svg viewBox=\"0 0 240 238\">\n<path class=\"sh\" fill-rule=\"evenodd\" d=\"M70,10 L170,10 A50,50 0 0 1 170,110 L70,110 A50,50 0 0 1 70,10 Z M70,30 L170,30 A30,30 0 0 1 170,90 L70,90 A30,30 0 0 1 70,30 Z\"/>\n<path class=\"ln\" d=\"M70,10 L170,10 A50,50 0 0 1 170,110 L70,110 A50,50 0 0 1 70,10 Z\"/><path class=\"ln\" d=\"M70,30 L170,30 A30,30 0 0 1 170,90 L70,90 A30,30 0 0 1 70,30 Z\"/>\n<line class=\"ln0 dash\" x1=\"70\" y1=\"10\" x2=\"70\" y2=\"110\"/><line class=\"ln0 dash\" x1=\"170\" y1=\"10\" x2=\"170\" y2=\"110\"/>\n<circle class=\"dot\" cx=\"70\" cy=\"60\" r=\"1.8\"/><line class=\"ln0\" x1=\"70\" y1=\"60\" x2=\"40\" y2=\"60\"/><text class=\"lab\" x=\"55\" y=\"56\">6 cm</text>\n<line class=\"ln0\" x1=\"40\" y1=\"60\" x2=\"20\" y2=\"60\"/><text class=\"lab\" x=\"30\" y=\"70\">4 cm</text>\n<line class=\"ln0\" x1=\"70\" y1=\"122\" x2=\"170\" y2=\"122\"/><line class=\"ln0\" x1=\"70\" y1=\"118\" x2=\"70\" y2=\"126\"/><line class=\"ln0\" x1=\"170\" y1=\"118\" x2=\"170\" y2=\"126\"/><text class=\"lab\" x=\"120\" y=\"133\">20 cm</text>\n<g class=\"L\" data-l=\"outer_l\"><path class=\"hl-or\" d=\"M70,10 L170,10 A50,50 0 0 1 170,110 L70,110 A50,50 0 0 1 70,10 Z\"/><text class=\"lab o\" x=\"120\" y=\"6\">바깥쪽 선</text></g>\n<g class=\"L\" data-l=\"inner_l\"><path class=\"hl-b\" d=\"M70,30 L170,30 A30,30 0 0 1 170,90 L70,90 A30,30 0 0 1 70,30 Z\"/><text class=\"lab b\" x=\"120\" y=\"64\">안쪽 선</text></g>\n<g class=\"L\" data-l=\"rects\"><rect class=\"hl-g\" x=\"70\" y=\"10\" width=\"100\" height=\"20\"/><rect class=\"hl-g\" x=\"70\" y=\"90\" width=\"100\" height=\"20\"/><text class=\"lab\" x=\"120\" y=\"23\">직사각형</text><text class=\"lab\" x=\"120\" y=\"103\">직사각형</text></g>\n<g class=\"L\" data-l=\"ring\"><path class=\"hl-p\" d=\"M70,10 A50,50 0 0 0 70,110 L70,90 A30,30 0 0 1 70,30 Z\"/><path class=\"hl-p\" d=\"M170,10 A50,50 0 0 1 170,110 L170,90 A30,30 0 0 0 170,30 Z\"/></g>\n<g class=\"L\" data-l=\"ring_join\"><circle class=\"tgt\" cx=\"120\" cy=\"183\" r=\"50\"/><circle class=\"tgt\" cx=\"120\" cy=\"183\" r=\"30\"/>\n<path class=\"hl-p go\" data-to=\"translate(50px,123px)\" d=\"M70,10 A50,50 0 0 0 70,110 L70,90 A30,30 0 0 1 70,30 Z\"/>\n<path class=\"hl-p go\" data-to=\"translate(-50px,123px)\" d=\"M170,10 A50,50 0 0 1 170,110 L170,90 A30,30 0 0 0 170,30 Z\"/>\n<text class=\"lab\" x=\"120\" y=\"187\">고리 모양</text></g>\n<g class=\"L\" data-l=\"straight_same\"><line class=\"hl-r\" x1=\"70\" y1=\"10\" x2=\"170\" y2=\"10\"/><line class=\"hl-r\" x1=\"70\" y1=\"30\" x2=\"170\" y2=\"30\"/><line class=\"hl-r\" x1=\"70\" y1=\"90\" x2=\"170\" y2=\"90\"/><line class=\"hl-r\" x1=\"70\" y1=\"110\" x2=\"170\" y2=\"110\"/><text class=\"lab r\" x=\"120\" y=\"78\">곧은 부분은 길이가 같아요</text></g>\n<g class=\"L\" data-l=\"radii\"><circle class=\"dot\" cx=\"170\" cy=\"60\" r=\"1.8\"/><line class=\"hl-r\" x1=\"170\" y1=\"60\" x2=\"220\" y2=\"60\"/><text class=\"lab r\" x=\"196\" y=\"54\">바깥 반지름</text><text class=\"lab r\" x=\"196\" y=\"72\">6 + 4</text></g>\n</svg>"}, {"id": "p5", "title": "나뭇잎 모양", "tag": "겹친 부분", "text": "한 변이 10 cm인 정사각형 안에 마주 보는 두 꼭짓점(점 찍은 곳)을 각각 중심으로 하는 원의 일부를 그렸습니다. 두 곡선으로 둘러싸인 나뭇잎 모양을 색칠했습니다.", "parts": [{"q": "색칠한 부분의 둘레는 몇 cm입니까?", "unit": "cm"}, {"q": "색칠한 부분의 넓이는 몇 cm²입니까?", "unit": "cm²"}, {"q": "정사각형에서 색칠하지 않은 부분의 넓이는 몇 cm²입니까?", "unit": "cm²"}], "svg": "<svg viewBox=\"0 0 180 172\">\n<path class=\"sh\" d=\"M20,10 A140,140 0 0 1 160,150 A140,140 0 0 1 20,10 Z\"/>\n<rect class=\"ln\" x=\"20\" y=\"10\" width=\"140\" height=\"140\"/><path class=\"ln\" d=\"M20,10 A140,140 0 0 1 160,150 A140,140 0 0 1 20,10 Z\"/>\n<circle class=\"dot\" cx=\"160\" cy=\"10\" r=\"2.5\"/><circle class=\"dot\" cx=\"20\" cy=\"150\" r=\"2.5\"/>\n<text class=\"lab\" x=\"90\" y=\"166\">10 cm</text>\n<g class=\"L\" data-l=\"q1\"><path class=\"hl-o\" d=\"M20,150 L20,10 A140,140 0 0 1 160,150 Z\"/><text class=\"lab o\" x=\"45\" y=\"130\">원의 1/4</text></g>\n<g class=\"L\" data-l=\"q2\"><path class=\"hl-p\" d=\"M160,10 L160,150 A140,140 0 0 1 20,10 Z\"/><text class=\"lab\" x=\"135\" y=\"35\">원의 1/4</text></g>\n<g class=\"L\" data-l=\"half\"><path class=\"hl-g\" d=\"M20,10 A140,140 0 0 1 160,150 Z\"/><line class=\"hl-r dash\" x1=\"20\" y1=\"10\" x2=\"160\" y2=\"150\"/></g>\n<g class=\"L\" data-l=\"tri\"><path class=\"hl-bf\" d=\"M20,150 L20,10 L160,150 Z\"/><text class=\"lab b\" x=\"60\" y=\"118\">직각삼각형</text></g>\n<g class=\"L\" data-l=\"outside\"><path class=\"hl-k\" d=\"M20,10 L160,10 L160,150 A140,140 0 0 0 20,10 Z\"/><path class=\"hl-k\" d=\"M20,10 L20,150 L160,150 A140,140 0 0 1 20,10 Z\"/></g>\n<g class=\"L\" data-l=\"arcs\"><path class=\"hl-r\" d=\"M20,10 A140,140 0 0 1 160,150\"/><path class=\"hl-r\" d=\"M160,150 A140,140 0 0 1 20,10\"/><text class=\"lab r\" x=\"128\" y=\"62\">곡선</text><text class=\"lab r\" x=\"52\" y=\"104\">곡선</text></g>\n</svg>"}, {"id": "p6", "title": "꽃잎 모양", "tag": "겹친 부분 · 나누기", "text": "한 변이 10 cm인 정사각형 안에 네 변을 각각 지름으로 하는 반원 4개를 그렸더니 꽃잎 모양 4장이 생겼습니다. 꽃잎을 색칠했습니다.", "parts": [{"q": "꽃잎 4장(색칠한 부분)의 넓이의 합은 몇 cm²입니까?", "unit": "cm²"}, {"q": "꽃잎 4장의 둘레의 합은 몇 cm입니까?", "unit": "cm"}], "svg": "<svg viewBox=\"0 0 180 172\">\n<path class=\"sh\" d=\"M20,10 A70,70 0 0 0 90,80 A70,70 0 0 0 20,10 Z M160,10 A70,70 0 0 1 90,80 A70,70 0 0 1 160,10 Z M160,150 A70,70 0 0 1 90,80 A70,70 0 0 1 160,150 Z M20,150 A70,70 0 0 1 90,80 A70,70 0 0 1 20,150 Z\"/>\n<rect class=\"ln\" x=\"20\" y=\"10\" width=\"140\" height=\"140\"/>\n<path class=\"ln0\" d=\"M20,10 A70,70 0 0 0 160,10 M160,10 A70,70 0 0 0 160,150 M160,150 A70,70 0 0 0 20,150 M20,150 A70,70 0 0 0 20,10\"/>\n<path class=\"ln\" d=\"M20,10 A70,70 0 0 0 90,80 A70,70 0 0 0 20,10 Z M160,10 A70,70 0 0 1 90,80 A70,70 0 0 1 160,10 Z M160,150 A70,70 0 0 1 90,80 A70,70 0 0 1 160,150 Z M20,150 A70,70 0 0 1 90,80 A70,70 0 0 1 20,150 Z\"/>\n<text class=\"lab\" x=\"90\" y=\"166\">10 cm</text>\n<g class=\"L\" data-l=\"semi1\"><path class=\"hl-o\" d=\"M20,10 A70,70 0 0 0 160,10 Z\"/><text class=\"lab o\" x=\"90\" y=\"30\">반원 1개</text></g>\n<g class=\"L\" data-l=\"semis\"><path class=\"hl-o3\" d=\"M20,10 A70,70 0 0 0 160,10 Z\"/><path class=\"hl-o3\" d=\"M160,10 A70,70 0 0 0 160,150 Z\"/><path class=\"hl-o3\" d=\"M160,150 A70,70 0 0 0 20,150 Z\"/><path class=\"hl-o3\" d=\"M20,150 A70,70 0 0 0 20,10 Z\"/><text class=\"lab\" x=\"90\" y=\"6\">반원 4개를 모두 칠하면?</text></g>\n<g class=\"L\" data-l=\"quad\"><rect class=\"hl-gq\" x=\"20\" y=\"10\" width=\"70\" height=\"70\"/><line class=\"ln0 dash\" x1=\"90\" y1=\"10\" x2=\"90\" y2=\"150\"/><line class=\"ln0 dash\" x1=\"20\" y1=\"80\" x2=\"160\" y2=\"80\"/><text class=\"lab g\" x=\"55\" y=\"92\">5 cm</text></g>\n<g class=\"L\" data-l=\"half\"><path class=\"hl-g\" d=\"M20,10 L90,80 A70,70 0 0 0 20,10 Z\"/><line class=\"hl-r dash\" x1=\"20\" y1=\"10\" x2=\"90\" y2=\"80\"/></g>\n<g class=\"L\" data-l=\"tri\"><path class=\"hl-bf\" d=\"M20,80 L20,10 L90,80 Z\"/><text class=\"lab b\" x=\"38\" y=\"72\">삼각형</text></g>\n<g class=\"L\" data-l=\"arcs\"><path class=\"hl-r\" d=\"M20,10 A70,70 0 0 0 90,80 A70,70 0 0 0 20,10\"/><text class=\"lab r\" x=\"28\" y=\"46\">곡선 2개</text></g>\n</svg>"}, {"id": "p7", "title": "S자 곡선 원", "tag": "옮겨 붙이기", "text": "반지름이 10 cm인 원 안에, 지름이 10 cm인 반원 두 개를 이어 S자 곡선을 그려 원을 둘로 나누었습니다. 한쪽을 색칠했습니다.", "parts": [{"q": "색칠한 부분의 넓이는 몇 cm²입니까?", "unit": "cm²"}, {"q": "색칠한 부분의 둘레는 몇 cm입니까?", "unit": "cm"}], "svg": "<svg viewBox=\"0 0 180 162\">\n<path class=\"sh\" d=\"M90,10 A70,70 0 0 0 90,150 A35,35 0 0 0 90,80 A35,35 0 0 1 90,10 Z\"/>\n<circle class=\"ln\" cx=\"90\" cy=\"80\" r=\"70\"/><path class=\"ln\" d=\"M90,150 A35,35 0 0 0 90,80 A35,35 0 0 1 90,10\"/>\n<circle class=\"dot\" cx=\"90\" cy=\"80\" r=\"1.8\"/><line class=\"ln0\" x1=\"90\" y1=\"80\" x2=\"160\" y2=\"80\"/><text class=\"lab\" x=\"135\" y=\"76\">10 cm</text>\n<g class=\"L\" data-l=\"bump\"><path class=\"hl-o\" d=\"M90,80 A35,35 0 0 1 90,150 Z\"/><text class=\"lab o\" x=\"132\" y=\"122\" style=\"text-anchor:start\">볼록</text></g>\n<g class=\"L\" data-l=\"dent\"><path class=\"hl-od\" d=\"M90,10 A35,35 0 0 0 90,80 Z\"/><text class=\"lab o\" x=\"48\" y=\"49\" style=\"text-anchor:end\">오목</text></g>\n<g class=\"L\" data-l=\"move\"><path class=\"hl-o go\" data-to=\"rotate(180deg)\" data-origin=\"90px 80px\" d=\"M90,80 A35,35 0 0 1 90,150 Z\"/></g>\n<g class=\"L\" data-l=\"half\"><path class=\"hl-g\" d=\"M90,10 A70,70 0 0 0 90,150 Z\"/><text class=\"lab g\" x=\"50\" y=\"84\">큰 원의 반?</text></g>\n<g class=\"L\" data-l=\"arcs\"><path class=\"hl-r\" d=\"M90,10 A70,70 0 0 0 90,150\"/><path class=\"hl-b\" d=\"M90,150 A35,35 0 0 0 90,80 A35,35 0 0 1 90,10\"/><text class=\"lab b\" x=\"105\" y=\"40\" style=\"text-anchor:start\">작은 곡선 2개</text></g>\n</svg>"}];
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let code=LS.get('mc.code',''), agreed=LS.get('mc.consent.v1',false);
+let solved=LS.get('mc.solved',{}), auto=LS.get('mc.auto',true), muted=LS.get('mc.mute',false);
+let cur=null, part=0, level=0, busy=false, listening=false, stopFn=null, lastSay='';
+const hist={};
+const hk=()=>cur.id+':'+part;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t,ms){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',ms||3500)}
+
+/* ── 목록 ── */
+function home(){
+  stopAll(); cur=null; $('#prob').style.display='none'; $('#home').style.display='block';
+  $('#cards').innerHTML=PROBS.map(p=>{const d=(solved[p.id]||[]).length;return `<div class="card" data-id="${p.id}"><div>${p.svg}</div><div class="t">${esc(p.title)}</div><span class="g">${esc(p.tag)}</span><div class="s">${d?`${d}/${p.parts.length} 문항 풀었어요`:`${p.parts.length}문항`}</div></div>`}).join('');
+  document.querySelectorAll('.card').forEach(c=>c.onclick=()=>openProb(c.dataset.id));
+}
+function openProb(id){
+  if(!code||!agreed){ askCode(()=>openProb(id)); return; }
+  unlockAudio();
+  cur=PROBS.find(p=>p.id===id); const sv=solved[id]||[];
+  part=0; while(part<cur.parts.length-1&&sv.includes(part)) part++;
+  $('#home').style.display='none'; $('#prob').style.display='block'; window.scrollTo(0,0);
+  $('#ptitle').textContent=`${cur.title} · ${cur.tag}`; $('#ptext').textContent=cur.text;
+  $('#fig').innerHTML=cur.svg; $('#log').innerHTML='';
+  tabs(); startPart();
+}
+function tabs(){
+  const sv=solved[cur.id]||[];
+  $('#tabs').innerHTML=cur.parts.map((q,i)=>`<button class="tab${i===part?' on':''}${sv.includes(i)?' done':''}" data-i="${i}">(${i+1}) ${esc(q.q)}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ if(+b.dataset.i===part) return; stopAll(); part=+b.dataset.i; tabs(); startPart(); });
+}
+function startPart(){
+  level=0; lv(); layers([],true);
+  const q=cur.parts[part];
+  const first=part===0?'그림을 잘 보세요. ':'';
+  const said=hist[hk()]&&hist[hk()].length;
+  const spoken=q.q.replace(/cm²/g,'제곱센티미터').replace(/cm/g,'센티미터');
+  coach(said?`${part+1}번으로 돌아왔어요. 어디까지 생각했는지 말해 볼래요?`:`${first}${part+1}번 문제예요. ${spoken} 바로 계산하지 말고, 그림을 어떻게 나누거나 옮기면 아는 도형이 될지 생각나는 대로 말해 보세요.`,[],false,{local:true});
+}
+function lv(){ $('#lv').innerHTML=[0,1,2,3].map(i=>`<i class="${i<level?'f':''}"></i>`).join(''); }
+
+/* ── 대화 ── */
+function bubble(r,t){const d=document.createElement('div');d.className='b '+r;d.textContent=t;$('#log').appendChild(d);$('#log').scrollTop=1e9;return d}
+function coach(t,show,clear,o){
+  o=o||{}; lastSay=t; bubble('c',t);
+  (hist[hk()]=hist[hk()]||[]).push({r:'c',t,show:show||[]});
+  layers(show||[],clear);
+  speak(t,()=>{ if(o.after) o.after(); else if(auto&&cur) listen(); });
+}
+async function studentSaid(t){
+  if(!cur) return;
+  bubble('s',t);
+  const key=hk(), h=(hist[key]=hist[key]||[]), prev=h.slice(-20);
+  h.push({r:'s',t});
+  busy=true; $('#mic').disabled=true; const th=bubble('c think','생각하고 있어요…');
+  let r;
+  try{ r=await post('/math/coach',{code,pid:cur.id,part,said:t,hist:prev,solved:solved[cur.id]||[],level}); }
+  catch(e){ th.remove(); busy=false; $('#mic').disabled=false; handleErr(e); return; }
+  th.remove(); busy=false; $('#mic').disabled=false;
+  if(r.error==='too_short'){ toast('잘 안 들렸어요. 다시 말해 주세요.'); return; }
+  level=Math.min(4,r.level|0); lv();
+  if(r.solved){
+    const sv=solved[cur.id]=solved[cur.id]||[]; if(!sv.includes(part)) sv.push(part); LS.set('mc.solved',solved); tabs();
+    const next=cur.parts.findIndex((q,i)=>!sv.includes(i));
+    coach(r.say,r.show,r.clear,{after:()=>{ if(next>=0&&cur){ setTimeout(()=>{ part=next; tabs(); startPart(); },700); } }});
+  } else coach(r.say,r.show,r.clear);
+}
+async function post(path,body){
+  const res=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  let j={}; try{ j=await res.json(); }catch(e){}
+  if(!res.ok||j.error&&j.error!=='too_short'){ const e=new Error(j.error||('http'+res.status)); e.code=j.error||res.status; throw e; }
+  return j;
+}
+function handleErr(e){
+  const c=e.code;
+  if(c==='no_code'){ code=''; LS.set('mc.code',''); askCode(null,'학생 코드를 확인할 수 없어요. 코드를 다시 넣거나, 만 14세 미만이면 보호자 동의서를 먼저 내 주세요.'); }
+  else if(c==='daily_limit') toast('오늘 코치와 이야기할 수 있는 횟수를 다 썼어요. 내일 다시 해요!',6000);
+  else if(c==='busy') toast('지금 코치가 바빠요. 잠시 뒤 다시 말해 주세요.',5000);
+  else toast('연결이 잘 안 됐어요. 다시 한 번 말해 주세요.',5000);
+}
+
+/* ── 그림 층 ── */
+function layers(show,clear){
+  const svg=$('#fig svg'); if(!svg) return;
+  if(clear) svg.querySelectorAll('.L.on').forEach(g=>g.classList.remove('on'));
+  (show||[]).forEach(k=>{ const g=svg.querySelector(`.L[data-l="${k}"]`); if(!g) return;
+    if(g.classList.contains('on')){ g.classList.remove('on'); setTimeout(()=>layerOn(g),400); } else layerOn(g); });
+}
+function layerOn(g){
+  g.classList.add('on');
+  g.querySelectorAll('.go').forEach(el=>{ el.style.transition='none'; el.style.transform='none'; if(el.dataset.origin) el.style.transformOrigin=el.dataset.origin;
+    void el.getBoundingClientRect(); el.style.transition=''; setTimeout(()=>{ el.style.transform=el.dataset.to; },1000); });
+}
+
+/* ── 목소리(읽어 주기) ── */
+let voice=null, speaking=false;
+function pickVoice(){ if(!window.speechSynthesis) return; const vs=speechSynthesis.getVoices().filter(v=>/^ko/i.test(v.lang));
+  voice=vs.find(v=>/Yuna|유나/.test(v.name)&&/premium|enhanced|고품질|프리미엄/i.test(v.name))||vs.find(v=>/Yuna|유나/.test(v.name))||vs.find(v=>/Google/.test(v.name))||vs[0]||null; }
+if(window.speechSynthesis){ speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }
+function unlockAudio(){ if(unlockAudio.d||!window.speechSynthesis) return; unlockAudio.d=1; try{ const u=new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); }catch(e){} }
+function speak(t,after){
+  if(!window.speechSynthesis||muted){ setTimeout(()=>after&&after(),400); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t); u.lang='ko-KR'; if(voice) u.voice=voice; u.rate=1.0;
+  let done=false; const go=()=>{ if(done) return; done=true; speaking=false; clearInterval(iv); after&&after(); };
+  u.onend=go; u.onerror=go; speaking=true; speechSynthesis.speak(u);
+  const t0=Date.now(); const iv=setInterval(()=>{ if(Date.now()-t0>1200&&!speechSynthesis.speaking&&!speechSynthesis.pending) go(); if(Date.now()-t0>60000) go(); },400);
+  speak.cancel=()=>{ done=true; speaking=false; clearInterval(iv); speechSynthesis.cancel(); };
+}
+
+/* ── 듣기(말 → 글) ── */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function setListening(v){ listening=v; $('#mic').classList.toggle('on',v); $('#mic').textContent=v?'■':'🎤'; }
+function live(t){ $('#live').textContent=t; }
+function listen(){
+  if(busy||listening||!cur) return;
+  if(speak.cancel) speak.cancel();
+  if(SR&&!LS.get('mc.useRec',false)) listenSR(); else listenRec();
+}
+function listenSR(){
+  let r; try{ r=new SR(); }catch(e){ LS.set('mc.useRec',true); return listenRec(); }
+  r.lang='ko-KR'; r.interimResults=true; r.continuous=true;
+  let fin='', mid='', timer=null, done=false, heard=false;
+  const finish=()=>{ if(done) return; done=true; clearTimeout(timer); try{ r.stop(); }catch(e){} setListening(false); const t=(fin+' '+mid).replace(/\s+/g,' ').trim(); live(''); if(t) studentSaid(t); };
+  r.onresult=e=>{ mid=''; for(let i=e.resultIndex;i<e.results.length;i++){ const x=e.results[i]; if(x.isFinal) fin+=x[0].transcript+' '; else mid+=x[0].transcript; }
+    heard=true; live((fin+mid).trim()); clearTimeout(timer); timer=setTimeout(finish,2800); };
+  r.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture'){ done=true; setListening(false); LS.set('mc.useRec',true); toast('이 화면에서는 녹음 방식으로 들을게요.'); setTimeout(listenRec,300); } };
+  r.onend=()=>{ if(!done){ if(heard) finish(); else { done=true; setListening(false); live(''); } } };
+  stopFn=finish;
+  try{ r.start(); }catch(e){ LS.set('mc.useRec',true); return listenRec(); }
+  setListening(true); live('듣고 있어요… 말해 보세요');
+  timer=setTimeout(()=>{ if(!heard) finish(); },15000);
+}
+async function listenRec(){
+  let stream; try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }catch(e){ toast('마이크를 쓸 수 없어요. 설정에서 마이크를 허용해 주세요.',6000); return; }
+  const mime=['audio/mp4','audio/webm;codecs=opus','audio/webm'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||'';
+  const mr=new MediaRecorder(stream,mime?{mimeType:mime}:undefined), chunks=[];
+  mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
+  const AC=window.AudioContext||window.webkitAudioContext, ac=new AC(), an=ac.createAnalyser(); an.fftSize=1024; ac.createMediaStreamSource(stream).connect(an);
+  const buf=new Float32Array(an.fftSize); let spoke=false, loud=Date.now(), t0=Date.now(), done=false;
+  const finish=()=>{ if(done) return; done=true; clearInterval(iv); try{ mr.stop(); }catch(e){} };
+  const iv=setInterval(()=>{ an.getFloatTimeDomainData(buf); let s=0; for(let i=0;i<buf.length;i++) s+=buf[i]*buf[i]; const rms=Math.sqrt(s/buf.length);
+    if(rms>0.02){ spoke=true; loud=Date.now(); } const n=Date.now(); if((spoke&&n-loud>2800)||(!spoke&&n-t0>15000)||n-t0>60000) finish(); },100);
+  mr.onstop=async()=>{ stream.getTracks().forEach(t=>t.stop()); try{ ac.close(); }catch(e){} setListening(false);
+    if(!spoke){ live(''); return; } live('알아듣는 중…');
+    const blob=new Blob(chunks,{type:mr.mimeType||mime||'audio/mp4'});
+    const b64=await new Promise(ok=>{ const fr=new FileReader(); fr.onload=()=>ok(String(fr.result).split(',')[1]||''); fr.readAsDataURL(blob); });
+    try{ const r=await post('/math/stt',{code,audio:b64,mime:blob.type}); live(''); if(r.text) studentSaid(r.text); else toast('잘 안 들렸어요. 다시 말해 주세요.'); }
+    catch(e){ live(''); handleErr(e); } };
+  stopFn=finish; mr.start(250); setListening(true); live('듣고 있어요… 말해 보세요');
+}
+function stopAll(){ if(listening&&stopFn){ const f=stopFn; stopFn=null; listening=false; try{ f(); }catch(e){} } setListening(false); live(''); if(speak.cancel) speak.cancel(); }
+
+/* ── 코드·동의 ── */
+let afterCode=null;
+function askCode(after,msg){ afterCode=after; $('#codeIn').value=code; $('#agree').checked=agreed; $('#msg').textContent=msg||''; chk(); $('#codeM').style.display='flex'; }
+function chk(){ $('#codeOk').disabled=!($('#codeIn').value.replace(/[^A-Za-z0-9]/g,'').length===8&&$('#agree').checked); }
+$('#codeIn').oninput=chk; $('#agree').onchange=chk;
+$('#codeX').onclick=()=>{ $('#codeM').style.display='none'; };
+$('#codeOk').onclick=()=>{ code=$('#codeIn').value.toUpperCase().replace(/[^A-Z0-9]/g,''); agreed=true; LS.set('mc.code',code); LS.set('mc.consent.v1',true); $('#codeM').style.display='none'; if(afterCode){ const f=afterCode; afterCode=null; f(); } };
+$('#codeBtn').onclick=()=>askCode(null);
+
+/* ── 단추 ── */
+$('#mic').onclick=()=>{ unlockAudio(); if(listening){ if(stopFn) stopFn(); } else listen(); };
+$('#hintB').onclick=()=>{ if(busy) return; stopAll(); studentSaid('힌트 주세요'); };
+$('#again').onclick=()=>{ if(lastSay){ stopAll(); speak(lastSay,()=>{ if(auto&&cur) listen(); }); } };
+$('#clr').onclick=()=>layers([],true);
+$('#toHome').onclick=home;
+$('#auto').checked=auto; $('#auto').onchange=()=>{ auto=$('#auto').checked; LS.set('mc.auto',auto); };
+function sndLabel(){ $('#snd').textContent=muted?'🔇 소리 끔':'🔈 소리 켬'; }
+$('#snd').onclick=()=>{ muted=!muted; LS.set('mc.mute',muted); sndLabel(); if(muted&&speak.cancel) speak.cancel(); }; sndLabel();
+home();
+// 점검용: 주소 끝 #t=p4:ring_join,rects → 그 문제를 열고 그림 층을 바로 보인다(소리·듣기 없음, 서버 호출 없음)
+(function(){ const T=location.hash.match(/^#t=(\w+)(?::([\w,]+))?/); if(!T) return; if(/nt/.test(location.search)){ const st=document.createElement('style'); st.textContent='*{transition:none!important}'; document.head.appendChild(st); } agreed=true; code=code||'XXXXXXXX'; muted=true; auto=false; openProb(T[1]); if(T[2]) layers(T[2].split(','),true); })();
+</script>
+<!--hubback-->
+<script>/* 통합앱에서 열었을 때만 맨 위에 「‹ 전체 앱」(hubback.py) */
+(function () {
+  var u; try { u = sessionStorage.getItem('hub:back'); } catch (e) {}
+  if (!u || u.indexOf(location.origin + '/') !== 0) return;
+  var box = document.createElement('div'), a = document.createElement('a');
+  box.setAttribute('style', 'max-width:780px;margin:0 auto;padding:10px 16px 0');
+  a.id = 'hubBack'; a.href = u; a.textContent = '‹ 전체 앱';
+  a.setAttribute('style', 'display:inline-block;padding:6px 14px 6px 10px;border:1px solid var(--line,#e1e0da);border-radius:999px;background:var(--card,#fff);color:var(--acc,#2f5bd3);font:600 14px/1.4 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;text-decoration:none');
+  a.onclick = function (e) {
+    var t = document.getElementById('test'), h = document.getElementById('home');   // 시험 화면이 있는 앱은 그것으로, 없으면 첫 화면이 보이는지로
+    var idle = t ? (t.hidden || t.offsetParent === null) : (!!h && !h.hidden && h.offsetParent !== null);
+    if (!idle && !confirm('전체 앱 목록으로 돌아갈까요?\n지금 푸는 문제는 이어서 풀 수 없을 수도 있습니다.')) e.preventDefault();
+  };
+  box.appendChild(a);
+  document.body.insertBefore(box, document.body.firstChild);
+  // 선생님 앱(leess-teacher)에서 왔으면 선생님 화면을 바로 연다(코드는 선생님 앱이 이 앱의 코드 자리에 넣어 두었다). 한 번만.
+  var tf; try { tf = sessionStorage.getItem('hub:teacher'); sessionStorage.removeItem('hub:teacher'); } catch (e) {}
+  var tb = document.getElementById('teacherBtn');
+  if (tf === '1' && tb && !tb.hidden) tb.click();
+})();
+</script>
+</body></html>
